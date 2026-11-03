@@ -70,7 +70,7 @@ export default function SdmMap({ slug, period, onPeriodChange }: { slug?: string
     <div className="relative w-full h-[520px] rounded-2xl overflow-hidden card-shadow border border-gray-100">
       <div ref={containerRef} className="w-full h-full" />
       <div className="absolute top-3 left-3 flex rounded-lg overflow-hidden shadow-sm text-xs font-sans border border-gray-200">
-        {([['current', lang === 'EN' ? 'Current (1980-2010)' : 'Actuel (1980-2010)'], ['2100', lang === 'EN' ? '2100 projection (2071-2100)' : 'Projection 2100 (2071-2100)']] as const).map(([k, label]) => (
+        {([['current', lang === 'EN' ? 'Current (1980-2010)' : 'Actuel (1980-2010)'], ['current-model', lang === 'EN' ? 'Current, model only' : 'Actuel, modèle seul'], ['2100', lang === 'EN' ? '2100, model only (2071-2100)' : '2100, modèle seul (2071-2100)']] as const).map(([k, label]) => (
           <button key={k} onClick={() => onPeriodChange(k)} aria-pressed={period === k}
             className={`px-3 py-1.5 cursor-pointer ${period === k ? 'bg-sage-500 text-white' : 'bg-white text-gray-600 hover:bg-gray-50'}`}>
             {label}
@@ -78,9 +78,14 @@ export default function SdmMap({ slug, period, onPeriodChange }: { slug?: string
         ))}
       </div>
       <div className="absolute bottom-6 left-3 bg-white/90 rounded-lg px-3 py-2 text-[10px] font-mono text-gray-600 shadow-sm pointer-events-none">
-        <div className="mb-1">{period === '2100'
-          ? (lang === 'EN' ? 'Ensemble, 2071-2100, 1 km (unclipped)' : 'Ensemble, 2071-2100, 1 km (non découpé)')
-          : (lang === 'EN' ? 'Ensemble (clipped), 1980-2010, 1 km' : 'Ensemble (découpé), 1980-2010, 1 km')}</div>
+        <div className="mb-1">{period === 'current'
+          ? (lang === 'EN' ? 'Ensemble (clipped to evidence), 1980-2010, 1 km' : 'Ensemble (découpé selon les preuves), 1980-2010, 1 km')
+          : (lang === 'EN' ? `Ensemble, ${period === '2100' ? '2071-2100' : '1980-2010'}, 1 km (model only, not clipped)` : `Ensemble, ${period === '2100' ? '2071-2100' : '1980-2010'}, 1 km (modèle seul, non découpé)`)}</div>
+        {period !== 'current' && (
+          <div className="mb-1 max-w-[16rem] whitespace-normal font-sans">{lang === 'EN'
+            ? 'Compare 2100 with "Current, model only". The clipped current map is not comparable: 2100 has no clipped version.'
+            : 'Comparez 2100 avec « Actuel, modèle seul ». La carte actuelle découpée n\'est pas comparable : 2100 n\'a pas de version découpée.'}</div>
+        )}
         {slug && (
           <>
             <div className="h-2 w-40 rounded-sm" style={{ background: 'linear-gradient(to right, #440154, #3b528b, #21918c, #5ec962, #fde725)' }} />

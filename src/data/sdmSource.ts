@@ -5,13 +5,17 @@ const TITILER_BASE = 'https://titiler.xyz/cog';
 // titiler.xyz's CDN caches the first caller's Access-Control-Allow-Origin without Vary: Origin; a per-origin key keeps sites from getting each other's header
 const ORIGIN_KEY = `&_host=${encodeURIComponent(window.location.host)}`; // host, not origin: titiler.xyz's firewall rejects 'http://localhost' in a query
 
-export type SdmPeriod = 'current' | '2100';
+export type SdmPeriod = 'current' | 'current-model' | '2100';
 
-// No clipped product exists for the future period
+// Only 1980-2010 has an evidence-clipped product, so 2100 compares like with like against 'current-model'
+const SDM_FILES: Record<SdmPeriod, string> = {
+  current: 'sdm-ensemble-clipped_1km_na_1980-2010',
+  'current-model': 'sdm-ensemble_1km_na_1980-2010',
+  '2100': 'sdm-ensemble_1km_na_2071-2100',
+};
+
 export const sdmCogUrl = (slug: string, period: SdmPeriod = 'current') =>
-  period === '2100'
-    ? `${ARBUTUS_BASE}/${slug}_sdm-ensemble_1km_na_2071-2100_sett1.tif`
-    : `${ARBUTUS_BASE}/${slug}_sdm-ensemble-clipped_1km_na_1980-2010_sett1.tif`;
+  `${ARBUTUS_BASE}/${slug}_${SDM_FILES[period]}_sett1.tif`;
 
 // Byte 0..99 suitability %, nodata 255
 export const sdmTileUrl = (cogUrl: string) =>
